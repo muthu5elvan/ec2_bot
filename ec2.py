@@ -44,7 +44,11 @@ try:
 except:
     print("[!] Install boto3 by using 'pip install boto3'")
     sys.exit()
-# from rich import print
+try:
+    from rich import print
+except:
+    pass
+
 import argparse
 import time
 parser = argparse.ArgumentParser()
