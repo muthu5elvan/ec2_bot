@@ -6,7 +6,8 @@ EC2_SSH_USERNAME = ""
 EC2_SSH_PRIVATE_KEY = ""
 ########################  ABOVE VALUES ARE REQUIRED ########################
 
-IP_RETRIVE_INTERVAL = 5  # Seconds
+IP_RETRIVE_INTERVAL = 10  # Seconds
+SSH_CONNECT_INTERVAL = 30 # After starting the Instance Waiting for 30 Seconds to Start SSH SERVICE
 
 ########################  ABOVE VALUES ARE OPTIONAL ########################
 
@@ -15,21 +16,6 @@ IP_RETRIVE_INTERVAL = 5  # Seconds
 Python3 is needed
 Install boto3 library in python3
 Configure the Above required Values
-
-To Run program
-python3 ec2.py
-
-To Run start the instance
-python3 ec2.py -c 1 
-
-To Run stop the instance
-python3 ec2.py -c 2
-
-To Run restart the instance
-python3 ec2.py -c 3 
-
-To Check Status
-python3 ec2.py -c 0
 """
 ############################################################################
 INFO = """Check The Choices:
@@ -43,7 +29,6 @@ INFO = """Check The Choices:
 
 
 import sys
-from tracemalloc import start
 try:
     import boto3
 except:
@@ -126,7 +111,6 @@ def connectInstance(ip):
     import shutil
     import os
     SSH_KEY = tempfile.NamedTemporaryFile(delete=False)
-    print(SSH_KEY.name)
     shutil.copyfile(EC2_SSH_PRIVATE_KEY,SSH_KEY.name)
     os.system("ssh {username}@{ip} -i {key}".format(
         username=EC2_SSH_USERNAME,
@@ -166,6 +150,7 @@ try:
         response = startInstance(instanceStatus)
         ip = getInstancePublicIP()
         if ip:
+            time.sleep(SSH_CONNECT_INTERVAL)
             connectInstance(ip)
     if args.verbose:
         v_print(response)
