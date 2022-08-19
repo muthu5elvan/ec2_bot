@@ -6,7 +6,7 @@ This ec2 program helps to manage the single EC2 instance
 
 > After installing the library you can run the program in intractive mode by `python ec2.py`
 
-![](assets/20220819_130157_image.png)
+![](assets/info.png)
 
 > If you like to run the program by argument follow the below commands
 
