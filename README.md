@@ -2,6 +2,21 @@
 
 This ec2 program helps to manage the single EC2 instance
 
+## Usage
+
+> After installing the library you can run the program in intractive mode by `python ec2.py`
+
+![](assets/20220819_130157_image.png)
+
+> If you like to run the program by argument follow the below commands
+
+* `python ec2.py -c 0` To Get status of the instance
+* `python ec2.py -c 1` To Start the instance
+* `python ec2.py -c 2` To Stop the instance
+* `python ec2.py -c 3` To Restart the instance
+
+![](assets/20220819_130429_image.png)
+
 ## Requirement
 
 * Python3
@@ -43,18 +58,3 @@ This ec2 program helps to manage the single EC2 instance
 
 ![](assets/20220819_125745_image.png)
 
-
-## Usage
-
-> After installing the library you can run the program in intractive mode by `python ec2.py`
-
-![](assets/20220819_130157_image.png)
-
-> If you like to run the program by argument follow the below commands
-
-* `python ec2.py -c 0` To Get status of the instance
-* `python ec2.py -c 1` To Start the instance
-* `python ec2.py -c 2` To Stop the instance
-* `python ec2.py -c 3` To Restart the instance
-
-![](assets/20220819_130429_image.png)
