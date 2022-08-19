@@ -128,7 +128,6 @@ def connectInstance(ip):
     SSH_KEY = tempfile.NamedTemporaryFile(delete=False)
     print(SSH_KEY.name)
     shutil.copyfile(EC2_SSH_PRIVATE_KEY,SSH_KEY.name)
-    os.system("notepad "+SSH_KEY.name)
     os.system("ssh {username}@{ip} -i {key}".format(
         username=EC2_SSH_USERNAME,
         ip=ip,
