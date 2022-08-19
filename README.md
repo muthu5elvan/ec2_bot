@@ -14,8 +14,10 @@ This ec2 program helps to manage the single EC2 instance
 * `python ec2.py -c 1` To Start the instance
 * `python ec2.py -c 2` To Stop the instance
 * `python ec2.py -c 3` To Restart the instance
+* `python ec2.py -c 4` Connect to SSH
+* `python ec2.py -c 5` Start Instance and Connect to SSH
 
-![](assets/20220819_130429_image.png)
+![](assets/command_5.png)
 
 ## Requirement
 
