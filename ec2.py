@@ -6,7 +6,7 @@ EC2_SSH_USERNAME = ""
 EC2_SSH_PRIVATE_KEY = ""
 ########################  ABOVE VALUES ARE REQUIRED ########################
 
-IP_RETRIVE_INTERVAL = 10  # Seconds
+IP_RETRIVE_INTERVAL = 15  # Seconds
 SSH_CONNECT_INTERVAL = 30 # After starting the Instance Waiting for 30 Seconds to Start SSH SERVICE
 
 ########################  ABOVE VALUES ARE OPTIONAL ########################
@@ -37,6 +37,8 @@ except:
 from rich import print
 import argparse
 import time
+global RESPONSE
+RESPONSE = ""
 parser = argparse.ArgumentParser()
 parser.add_argument("-v", "--verbose", help = "Show Debug",action='store_true',default=False)
 parser.add_argument("-c", "--choice", help = INFO,default=False)
@@ -56,57 +58,61 @@ def v_print(msg):
     print("[-]")
 
 def getInstanceStatus():
+    global RESPONSE
     print("[+] Getting Instance Status")
-    response = ec2.describe_instances(InstanceIds=[EC2_INSTANCE])
+    RESPONSE = ec2.describe_instances(InstanceIds=[EC2_INSTANCE])
     try :
-        print("Instance Name : ",response["Reservations"][0]['Instances'][0]['KeyName'])
+        print("Instance Name : ",RESPONSE["Reservations"][0]['Instances'][0]['KeyName'])
     except:
         print("Instance Name : ","Not Found")
     
     try :
-        print("Instance PublicIp : ",response["Reservations"][0]['Instances'][0]['PublicIpAddress'])
+        print("Instance PublicIp : ",RESPONSE["Reservations"][0]['Instances'][0]['PublicIpAddress'])
     except:
         print("Instance PublicIp : ","Not Found")
     
     try :
-        print("Instance Status : ", response["Reservations"][0]['Instances'][0]['State']['Name'].upper())
+        print("Instance Status : ", RESPONSE["Reservations"][0]['Instances'][0]['State']['Name'].upper())
     except:
         print("Instance Status : ","Not Found")
     
     try :
-        print("Instance Type : ",response["Reservations"][0]['Instances'][0]['Tags'])
+        print("Instance Type : ",RESPONSE["Reservations"][0]['Instances'][0]['Tags'])
     except:
         print("Instance Type : ","Not Found")
     print("")
-    return response["Reservations"][0]['Instances'][0]['State']['Name'].upper()
+    return RESPONSE["Reservations"][0]['Instances'][0]['State']['Name'].upper()
 
 def getInstancePublicIP():
-    
+    global RESPONSE
     print("[+] Getting Instance Status")
-    response = ec2.describe_instances(InstanceIds=[EC2_INSTANCE])
-    while response["Reservations"][0]['Instances'][0]['State']['Name'].upper() == "PENDING":
+    RESPONSE = ec2.describe_instances(InstanceIds=[EC2_INSTANCE])
+    while RESPONSE["Reservations"][0]['Instances'][0]['State']['Name'].upper() == "PENDING":
+        RESPONSE = ec2.describe_instances(InstanceIds=[EC2_INSTANCE])
+        print("[#] Instance Status is : ",RESPONSE["Reservations"][0]['Instances'][0]['State']['Name'].upper())
         time.sleep(IP_RETRIVE_INTERVAL)
-        response = ec2.describe_instances(InstanceIds=[EC2_INSTANCE])
-        print("[#] Instance Status is : ",response["Reservations"][0]['Instances'][0]['State']['Name'].upper())
     try :
-        print("Instance PublicIp : ",response["Reservations"][0]['Instances'][0]['PublicIpAddress'])
-        return response["Reservations"][0]['Instances'][0]['PublicIpAddress']
+        print("Instance PublicIp : ",RESPONSE["Reservations"][0]['Instances'][0]['PublicIpAddress'])
+        return RESPONSE["Reservations"][0]['Instances'][0]['PublicIpAddress']
     except:
         print("Instance PublicIp : ","Not Found")
-        print("Instance Status : ", response["Reservations"][0]['Instances'][0]['State']['Name'].upper())
+        print("Instance Status : ", RESPONSE["Reservations"][0]['Instances'][0]['State']['Name'].upper())
 
 def startInstance(instanceStatus):
-    response = ""
+    global RESPONSE
+    RESPONSE = ""
     if instanceStatus != "STOPPING":
         print("[+] Starting Instance")
-        response = ec2.start_instances(InstanceIds=[EC2_INSTANCE])
+        RESPONSE = ec2.start_instances(InstanceIds=[EC2_INSTANCE])
         getInstanceStatus()
         getInstancePublicIP()
-        return response
+        return RESPONSE
     else:
         print("[*] Instance is Not Stopped Yet \nTry Again After few Minutes")
 
 def connectInstance(ip):
+    global RESPONSE
+    print("[+] Connecting to SSH")
     import tempfile
     import shutil
     import os
@@ -130,30 +136,34 @@ try:
     else:
         choice = int(args.choice)
     print("")
-    response = ""
+    RESPONSE = ""
     if choice == 1:
-        response = startInstance(instanceStatus)
+        RESPONSE = startInstance(instanceStatus)
     if choice == 2:
         print("[+] Stopping Instance")
-        response = ec2.stop_instances(InstanceIds=[EC2_INSTANCE])
+        RESPONSE = ec2.stop_instances(InstanceIds=[EC2_INSTANCE])
         getInstanceStatus()
     if choice == 3:
         print("[+] Rebooting Instance")
-        response = ec2.reboot_instances(InstanceIds=[EC2_INSTANCE])
+        RESPONSE = ec2.reboot_instances(InstanceIds=[EC2_INSTANCE])
         getInstanceStatus()
     if choice == 4 :
         ip = getInstancePublicIP()
-        if ip:
+        if ip and "RUNNING" == RESPONSE["Reservations"][0]['Instances'][0]['State']['Name'].upper():
             connectInstance(ip)
+        else:
+            print("[*] Instance Not in Running State")
 
     if choice == 5 :
-        response = startInstance(instanceStatus)
+        RESPONSE = startInstance(instanceStatus)
         ip = getInstancePublicIP()
-        if ip:
+        if ip and "RUNNING" == RESPONSE["Reservations"][0]['Instances'][0]['State']['Name'].upper():
             time.sleep(SSH_CONNECT_INTERVAL)
             connectInstance(ip)
+        else:
+            print("[*] Instance Not in Running State")
     if args.verbose:
-        v_print(response)
+        v_print(RESPONSE)
     
 except Exception as ex:
-    print("[*] ",ex)
+    print("[*] ",ex,ex.with_traceback())
