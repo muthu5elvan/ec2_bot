@@ -138,7 +138,7 @@ try:
     print("")
     RESPONSE = ""
     if choice == 1:
-        RESPONSE = startInstance(instanceStatus)
+        startInstance(instanceStatus)
     if choice == 2:
         print("[+] Stopping Instance")
         RESPONSE = ec2.stop_instances(InstanceIds=[EC2_INSTANCE])
@@ -155,7 +155,7 @@ try:
             print("[*] Instance Not in Running State")
 
     if choice == 5 :
-        RESPONSE = startInstance(instanceStatus)
+        startInstance(instanceStatus)
         ip = getInstancePublicIP()
         if ip and "RUNNING" == RESPONSE["Reservations"][0]['Instances'][0]['State']['Name'].upper():
             time.sleep(SSH_CONNECT_INTERVAL)
