@@ -4,7 +4,7 @@ AWS_ACCESS_KEY_ID = ''
 AWS_SECRET_ACCESS_KEY = ''
 ########################  ABOVE VALUES ARE REQUIRED ########################
 
-IP_RETRIVE_INTERVAL = 2  # Seconds
+IP_RETRIVE_INTERVAL = 4  # Seconds
 
 ########################  ABOVE VALUES ARE OPTIONAL ########################
 
