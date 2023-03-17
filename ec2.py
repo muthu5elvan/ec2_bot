@@ -31,10 +31,10 @@ INFO = """Check The Choices:
 import sys
 try:
     import boto3
+    from rich import print
 except:
-    print("[!] Install boto3 by using 'pip install boto3'")
+    print("[!] Install boto3 by using 'pip install boto3 rich'")
     sys.exit()
-from rich import print
 import argparse
 import time
 global RESPONSE
